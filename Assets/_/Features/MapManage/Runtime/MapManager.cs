@@ -1,6 +1,8 @@
 using System;
+using Codice.Client.Commands.CheckIn;
 using UnityEditor.Graphs;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MapManage.Runtime
 {
@@ -35,7 +37,11 @@ namespace MapManage.Runtime
                 Vector2Int coordonne = GrillageMap(null, i);
                 GameObject cell = Instantiate(m_prefabs, new Vector3(coordonne.x, coordonne.y, 0), Quaternion.identity, transform);
                 m_cell[i] = cell;
+                
                 MapDisign(i, cell);
+
+                var clickable = cell.AddComponent<CelluleInteractif>();
+                clickable.Init(this,i);
             }
 
             #region useless
@@ -51,42 +57,56 @@ namespace MapManage.Runtime
 
         private void Update()
         {
-            //NextGen();
+            if (Input.GetKeyDown(KeyCode.Space)) _IsPlaying = true;
+            if (Input.GetKeyUp(KeyCode.A)) _IsPlaying = false;
+            if (_IsPlaying)
+            {
+                _timer += Time.deltaTime;
+               if (_timer >= _delayGeneration)
+                {
+                    NextGen();
+                    _timer = 0;
+                }
+                
+            }
         }
 
         void NextGen()
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-        {
-            var size = m_mapDimensions.x * m_mapDimensions.y;
-            sbyte[] NewEtats = new sbyte[size];
-            for (sbyte i = 0; i < size; i++)
-            {
-                Vector2Int coordonne = GrillageMap(m_prefabs, i);
-                int OnALife = CompteALife(coordonne);
-                int etatActuel = m_levelDisign[i];
-                if (etatActuel == 1)
-                {
-                    int result = (OnALife == 2 || OnALife == 3) ? 1 : 0;
-                    NewEtats[i] = (sbyte)result;
-                }
-                else
-                {
-                    int result = (OnALife == 2 || OnALife == 3) ? 1 : 0;
-                    NewEtats[i] = (sbyte)result;
-                }
+            NewTab();
+        }
 
+        private void NewTab()
+        {
+                var size = m_mapDimensions.x * m_mapDimensions.y;
+                sbyte[] NewEtats = new sbyte[size];
+                for (sbyte i = 0; i < size; i++)
+                {
+                    Vector2Int coordonne = GrillageMap(m_prefabs, i);
+                    int OnALife = CompteALife(coordonne);
+                    int etatActuel = m_levelDisign[i];
+                    if (etatActuel == 1)
+                    {
+                        int result = (OnALife == 2 || OnALife == 3) ? 1 : 0;
+                        NewEtats[i] = (sbyte)result;
+                    }
+                    else
+                    {
+                        int result = (OnALife == 3) ? 1 : 0;
+                        NewEtats[i] = (sbyte)result;
+                    }
+
+                
+                }
                 for (int j = 0; j < size; j++)
                 {
                     m_levelDisign[j] = NewEtats[j];
                     MapDisign(j, m_cell[j]);
                 }
-            }
         }
-        }
-    
 
-    private int CompteALife(Vector2Int coordonne)
+
+        private int CompteALife(Vector2Int coordonne)
         {
             int count = 0;
             for (int y = -1; y <= 1; y++)
@@ -117,24 +137,17 @@ namespace MapManage.Runtime
 
         #region Main Methode
 
-        
+        public void ToggleCell(int i)
+        {
+            m_levelDisign[i] = (sbyte)(m_levelDisign[i] == 1 ? 0 : 1);
+            MapDisign(i, m_cell[i]);
+        }
 
         #endregion
         
         
         #region privat
-
-        // private void MapDisign1(int i, GameObject currentcell)
-        // {
-        //     var inter = m_levelDisign[i];
-        //     Material renderer = currentcell.GetComponent<Renderer>().sharedMaterial;
-        //     switch (inter)
-        //     {
-        //         case 0 : renderer.color = _waterColor; break;
-        //         case 1: renderer.color = _groundColor; break;
-        //         case 2: renderer.color = _dirtColor; break;
-        //     }
-        // }
+        
         
         private void MapDisign(int i, GameObject currentcell)
         {
@@ -172,7 +185,9 @@ namespace MapManage.Runtime
         [SerializeField] private Color _waterColor = Color.blue;
         [SerializeField] private Color _groundColor = Color.green;
         [SerializeField] private Color _dirtColor = Color.gray;
-        
+        [SerializeField] private float _delayGeneration;
+        bool _IsPlaying = false;
+        private float _timer;
 
         #endregion
     }
