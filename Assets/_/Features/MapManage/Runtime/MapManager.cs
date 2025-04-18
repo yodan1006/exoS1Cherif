@@ -30,7 +30,7 @@ namespace MapManage.Runtime
             m_cell = new GameObject[size];
             //Vector3 currentCellPosition = new Vector3();
             //var etats = new int[size];
-            for (int i = 0; i < m_levelDisign.Length; i++)
+            for (int i = 0; i < size; i++)
             {
                 Vector2Int coordonne = GrillageMap(null, i);
                 GameObject cell = Instantiate(m_prefabs, new Vector3(coordonne.x, coordonne.y, 0), Quaternion.identity, transform);
@@ -51,12 +51,12 @@ namespace MapManage.Runtime
 
         private void Update()
         {
-            NextGen();
+            //NextGen();
         }
 
         void NextGen()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetKeyDown(KeyCode.Space))
         {
             var size = m_mapDimensions.x * m_mapDimensions.y;
             sbyte[] NewEtats = new sbyte[size];
@@ -138,11 +138,11 @@ namespace MapManage.Runtime
         
         private void MapDisign(int i, GameObject currentcell)
         {
-            var inter = m_levelDisign[i];
+            sbyte inter = m_levelDisign[i];
             Renderer renderer = currentcell.GetComponent<Renderer>();
             switch (inter)
             {
-                case 0 : renderer.material.color = _waterColor; break;
+                case 0: renderer.material.color = _waterColor; break;
                 case 1: renderer.material.color = _groundColor; break;
                 case 2: renderer.material.color = _dirtColor; break;
             }
@@ -150,7 +150,7 @@ namespace MapManage.Runtime
         
         private Vector2Int GrillageMap(GameObject currentcell, int i)
         {
-            return new Vector2Int(i % m_mapDimensions.x, i / m_mapDimensions.x);
+            return new Vector2Int(i % m_mapDimensions.x, i / m_mapDimensions.x );
         }
 
         private int IndexFrom2DCoordinate(Vector2Int position, Vector2Int mapDimensions)

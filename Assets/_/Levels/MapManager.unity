@@ -150,7 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_prefabs: {fileID: 8785485342314020329, guid: a2d36f4a79e70a84590d1a491f3caecd, type: 3}
   m_mapDimensions: {x: 6, y: 6}
-  m_levelDisign: 0000000000000000000101010101010000000000000000000000000000000000000000
+  m_levelDisign: 000000000000000101010000000000000000000000000000000000000000000000000000
   _grillageTaille: 0
   _position: {x: 1, y: 1}
   indexForCoo: 0
